@@ -1,0 +1,166 @@
+COURSE columns
+title
+name
+syllabus
+weekday_starts
+weekend_starts
+weekday_price
+weekend_price
+weekday_duration
+weekend_duration
+discount
+discount_ends
+discount_on
+
+USER columns
+name
+phone
+email
+password 
+payment_status
+paid
+payment_confirmed 
+program_type 
+course_type
+
+USER_ROLE columns
+user_id
+role_id
+
+PAYMENT_DETAILS
+user_id
+image_path
+amount_paid
+amount_remaining
+
+REGISTRATION_FEEDBACKS
+interest
+channel
+
+ROLES
+name
+description
+
+
+@POST '/courses'
+  -> data to be received: course_name
+  -> confirm if the course_name is in the data base 
+  -> if True, return the course object
+  -> if false, return with message: course is not found
+
+@POST '/courses/discount'
+  -> data to be received: course_name, discount
+  -> find course from db using course_name
+  -> confirm is discount contains 'k'
+  -> if True, replace 'k' with '000'
+  -> if False, return with message: discount is false
+  -> check if discount == db course.discount and course.discount_ends hasn't expired
+  -> if True, return with the course object with message: 'countdown' is active
+  -> if false, return with the message: 'countdown' expired
+
+@POST '/application'
+  -> data to be received: course_name
+  -> find course from db using course_name
+  -> if found, return the course object
+  -> if not, return with the message: 'course' not found
+
+@POST '/logout'
+
+#POST '/registration/{course}', 'RegistrationController@register');
+  -> data to be received: course_name
+
+
+@POST '/registration/feedback'
+  -> data to be received: interest, channel
+
+  -> save details in db table RegistrationFeedback
+  -> if saved, return with message: 'feedback' saved
+  -> if not, return with the message: 'feedback' not saved
+
+@POST '/dashboard'##
+  -> data to be received: authentication
+  -> send if user is authenticated
+
+@POST '/upload'##
+  -> data to be received: image, authentication
+  -> authenticate user, if actual user, continue, if not return with message: 'user' not found
+  -> confirm image sent is actual image
+  -> change name of image using the time stamp and a random number
+  -> upload it to a path (it'll be given to you)
+  -> store in PaymentDetail table with user_id and image_path
+  -> send mail to admin with message 'payment document uploaded'
+  -> if successful, return with 'messsage': 'document uploaded successfully.'
+  -> if not return with 'message': failed
+
+@POST '/admin'##
+  -> data to be received: authentication
+  -> confirm if its user and admin
+  -> if it's user and admin, return with message: 'user' is admin
+  -> if it's user and not admin, return with message: 'user' is payment_confirmed
+  -> if it's not user return with message: 'user' is not authenticated
+
+@POST '/admin/users'##
+  -> data to be received: none 
+  -> confirmed as admin as above
+  -> return with a list of all users
+
+@POST /admin/users##
+  -> data to be received: user_id
+  -> confirm authentication as admin as above
+  -> with the user_id, find the user
+  -> if user is found, return with the user object
+  -> if not, return with 'user' not in db
+
+@POST '/users/payment/confirm'##
+  -> data to be received: user_id
+  -> confirm authentication as admin as above
+  -> with the user_id, find the user
+
+@POST '/users/search'##
+  -> data to be received: user_email
+  -> confirm authentication as admin as above
+  -> with the user_email, find user from the db
+  -> if user found, return with the user object
+  -> if not, return with 'user' not found
+
+@POST '/admin/courses'##
+  -> data to be received: none
+  -> confirm authentication as admin as above
+  -> return with the list of all courses in the db
+
+@POST '/admin/courses/'##
+  -> data to be received: type, course object{'course_id', ''syllabus', 'title', 'weekday_price', 'weekday_duration', 'weekday_starts', 'weekend_price', 'weekend_duration', 'weekend_starts'}
+  -> confirm authentication as admin as above
+  -> validate all inputs
+    -> syllabus: required,
+    -> title: 'required, minimum characters of 10,
+    -> weekday_price: required, integer
+    -> weekday_duration: required, integer
+    -> weekend_duration: required, integer'
+    -> weekday_starts: required, must be a date and must be formatted as:"d-m-Y"
+    -> weekend_starts: required, must be a date and must be formatted as:"d-m-Y"
+    -> weekend_price: required, integer
+  -> if 'type' is create, store course object in db
+  -> if 'type' is edit, find course in db using the course_id then update course in db
+  -> if successful, if type is 'create' return with message: 'course' created successfully but if 'type' is 'edit', return with message: 'course' edited successfully
+  -> if not return with the message: 'course' not created or edited
+
+@POST '/admin/courses', 'CourseController@show')->name('showCourse')##
+  -> data to be received: course_id
+  -> confirm authentication as admin above
+  -> find course in the db using the course_id
+  -> if successful, return with the course object.
+  -> if not, return with message: 'course not found'
+
+@POST '/admin/courses/discount'##
+  -> data to be received: discount, discount_on, discount_ends, course_id
+  -> confirm authentication as admin as above
+  -> validate inputs
+    -> discount: integer, required
+    -> discount_ends: integer, must be a date and must be formatted as :"d-m-Y"
+    -> discount_on: must be boolean
+  
+  -> if all is validated, find course with course_id given
+  -> update course data using the info provided (discount, discount_on and discount_ends)
+  -> remember, discount_ends must be parsed as a date
+  -> if successful, return with message: course edited successfully.
