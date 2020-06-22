@@ -1,7 +1,7 @@
 import mysql.connector as mysql
 from datetime import datetime
 import os, imghdr, random
-import mysql.connector.cursor
+#import mysql.connector.cursor
 
 import smtplib, ssl
 
@@ -53,12 +53,12 @@ def queryDiscount(course, disc):
 		discount = discount.replace("k","000")
 
 
-		query = """SELECT discount, discount_ends FROM COURSE WHERE COURSE.name = {}""".format(course_name)
+		query = """SELECT discount, discount_ends FROM COURSE WHERE COURSE.name = '{}'""".format(course_name)
 		cursor.execute(query)
 
-		for row in cursor.fetchall:
-			db_discount = row[0]
-			discount_ends = row[1]
+		for row in cursor.fetchall():
+			db_discount = row['discount']
+			discount_ends = row['discount_ends']
 
 			if discount == db_discount and discount_ends != 'expired':
 				response = "'countdown' is active"
@@ -78,8 +78,9 @@ def queryDiscount(course, disc):
 def queryApplication(course):
 	course_name = course
 
-	query = """SELECT * FROM COURSE WHERE name = {}""".format(course_name)
+	query = """SELECT * FROM COURSE WHERE name = '{}'""".format(course_name)
 	count = cursor.execute(query)
+	count = len(cursor.fetchone())
 
 	if count > 0:
 		response = course_name
@@ -96,7 +97,7 @@ def feedBack(interests, channels):
 	interest = interests
 	channel = channels
 
-	query = """INSERT into REGISTRATION_FEEDBACKS (interest, channel) values ({},{})""".format(interest, channel)
+	query = """INSERT into REGISTRATION_FEEDBACKS (interest, channel) values ('{}','{}')""".format(interest, channel)
 	try:
 		cursor.execute(query)
 		conn.commit()
@@ -115,7 +116,7 @@ def queryUsers():
 	cursor.execute(query)
 
 	for row in cursor.fetchall():
-		name = row[0]
+		name = row['name']
 		users.append(name)
 
 
@@ -127,11 +128,11 @@ def queryUsers():
 def queryUser(user_id):
 	userID = user_id
 
-	query = """SELECT * FROM USER WHERE USER.id = {}""".format(userID)
+	query = """SELECT * FROM USER WHERE id = {}""".format(userID)
 	try:
 		cursor.execute(query)
 
-		for row in cursor.ftechone():
+		for row in cursor.fetchall():
 			name = row['name']
 			email = row['email']
 			phone = row['phone']
@@ -143,7 +144,7 @@ def queryUser(user_id):
 			return user
 
 	except:
-		return {"messaege":"user not in db"}
+		return {"message":"user not in db"}
 
 
 
@@ -152,29 +153,33 @@ def queryUser(user_id):
 def queryUserEmail(user_email):
 	userEmail = user_email
 
-	query = """SELECT name FROM USER WHERE USER.email = {}""".format(userEmail)
+	query = """SELECT name FROM USER WHERE USER.email = '{}'""".format(userEmail)
 	cursor.execute(query)
 	count = cursor.fetchone()
-	user = count[0]
+	try:
+		user = count['name']
 
-	if user:
-		response = {"user":user}
+		if user:
+			response = {"user":user}
 
-	else:
-		response ="User not found"
+		else:
+			response = "User not found"
 
-	return response
+		return response
+
+	except:
+		return {"response":"no user found"}
 
 
 
 
 def queryCourses():
 	courses = []
-	query = """SELECT name FROM COURSE"""
+	query = """SELECT * FROM COURSE"""
 	cursor.execute(query)
 
 	for row in cursor.fetchall():
-		course = row[0]
+		course = row['title']
 		courses.append(course)
 
 
@@ -188,30 +193,38 @@ def dashboardQuery(email, password):
 	mail = email
 	passwd = password
 
-	query = """SELECT password, id FROM USER WHERE email = {}""".format(mail)
-	cursor.execute(query)
-	count = cursor.fetchone()
-	count = len(count)
-
-	if count > 0:
-		print("User exist")
-		password = cursor.fetchone()
-
-		if password == passwd:
-			print("Password match")
-			response = (True, userID)
-
-		else:
-			print("Password mismatch")
-			response = (False, userID)
+	query = """SELECT * FROM USER WHERE email = '{}'""".format(mail)
+	try:
+		cursor.execute(query)
 
 
-	else:
-		print("User do not exist")
-		response = (False, userID)
+
+		for row in cursor.fetchall():
+			password = row['password']
+			userID = row['id']
+			name = row['name']
+			email = row['email']
+			phone = row['phone']
+
+			if str(password) == passwd:
+				print("Password match")
+				data = {"name":name, "email": email, "phone": phone, "userID": userID}
+				response = ("True", data)
+				return response
+
+			else:
+				print("Password mismatch")
+				response = ("False", userID)
+				return response
+
+	except Exception as error:
+		response = ("False", mail)
+		return response
 
 
-	return response
+
+
+	
 
 
 
@@ -264,9 +277,9 @@ def confirmAdmin(user_id):
 	query = """SELECT USER_ROLE.role_id from USER_ROLE INNER JOIN USER ON USER.id=USER_ROLE.user_id WHERE USER.id = '{}'""".format(userID)
 	cursor.execute(query)
 	count =  cursor.fetchone()
-	role_id = count[0]
+	role_id = count['role_id']
 
-	if role_id == 'admin':
+	if role_id == 1:
 		response = 'User is admin'
 	else:
 		response = 'User is not admin'
@@ -278,7 +291,7 @@ def confirmAdmin(user_id):
 
 def confirmUserPay(user_id):
 	userID = user_id
-	query = """SELECT * FROM PAYMENT_DETAILS WHERE user_id = {}"""format(userID)
+	query = """SELECT * FROM PAYMENT_DETAILS WHERE user_id = {}""".format(userID)
 	cursor.execute(query)
 	count = cursor.fetchone()
 
@@ -298,13 +311,19 @@ def updateCourse(course_id, discount, discount_on, discount_ends):
 	discON = discount_on
 	discEND = discount_ends
 
-	query = """UPDATE COURSE SET discount = {}, discount_ends = {}, discont_on = {} WHERE COURSE.id = {}""".format(disc, discEND, discON, courseID)
+	query = """UPDATE COURSE SET discount = '{}', discount_ends = '{}', discount_on = '{}' WHERE COURSE.id = {}""".format(disc, discEND, discON, courseID)
 	try:
 		cursor.execute(query)
 		response = {"message":"course edited successfully"}
+		return response
 
 	except Exception as error:
 		response = {"message":"course not updated"}
+		return response
+
+
+
+
 
 
 
@@ -336,7 +355,8 @@ def queryAdminCourse(course_id):
 
 
 def storeCourseObj(syllabus,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts):
-	query = "INSER INTO COURSE (syllabus,title,name,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts) values ({},{},{},{},{},{},{},{},{})".format(syllabus,title,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts)
+	query = """INSERT INTO COURSE (syllabus,title,name,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts)
+				values ('{}','{}','{}','{}','{}','{}','{}','{}','{}')""".format(syllabus,title,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts)
 	try:
 		cursor.execute(query)
 		return "course created"
