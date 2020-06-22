@@ -108,7 +108,7 @@ def upload():
 				})
 			print(access_token)
 			feedback = verifyImage(file, userID)
-			return feedback
+			return {"feedback":feedback}
 
 
 
