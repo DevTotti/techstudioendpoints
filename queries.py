@@ -224,46 +224,55 @@ def dashboardQuery(email, password):
 
 
 
-	
-
-
-
-
 
 def verifyImage(file, user_id):
-	imgFile = file
+	imgfile = file
 	userID = user_id
-	data = imghrd.what(imgfile)
-	timenow = datetime.now
+	data = imghdr.what(imgfile)
+	timenow = datetime.now()
 	timestmp = timenow.time()
 	timeFile = str(timestmp.hour)+":"+str(timestmp.minute)+":"+str(timestmp.second)
-	randFile = rnadom.randint(1,10)
+	randFile = random.randint(1,10)
 
 	timeFile = timeFile + str(randFile)
 
 	if data == 'png' or data == 'jpeg':
 		print("Valid File")
 		imgfile.filename = str(timeFile)
-		imagePath = ""
+		imagePath = "C:/Users/HP/Documents/techAcademy/docs"
 		try:
-			query = """INSERT INTO PAYMENT_DETAILS (user_id,image_path) values({},{})""".format(userID, imagePath)
+			query = """INSERT INTO PAYMENT_DETAILS (user_id,image_path,amount_paid, amount_remaining) values('{}','{}','{}','{}')""".format(userID, imagePath, 50000, 10000)
 			cursor.execute(query)
-			message = """\
-			Subject: Payment Document Uploaded
+			conn.commit()
+			print("successfully")
 
-			Te payment document for user {} has been uploaded succssfuy
-			""".format(userID)
+			try:
+				message = """\
+				Subject: Payment Document Uploaded
 
-			context = ssl.create_default_context()
-			with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-				server.login(sender_email, password)
-				server.sendmail(sender_email, receiver_email, message)
+				Te payment document for user {} has been uploaded succssfuy
+				""".format(userID)
 
-			response = {"messsage": "document uploaded successfully."}
+				context = ssl.create_default_context()
+				with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+					server.login(sender_email, password)
+					server.sendmail(sender_email, receiver_email, message)
+
+				response = {"messsage": "document uploaded successfully."}
+
+				return response
+
+			except Exception as error:
+				response = {"feedback":str(error)}
+				print(response)
+				return response
+
+			
 
 
 		except Exception as error:
 			response = {"message":"Failed"}
+			return response
 
 
 	else:

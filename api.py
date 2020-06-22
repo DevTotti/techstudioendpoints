@@ -89,25 +89,25 @@ def feedback():
 @app.route('/upload', methods=['POST'])
 def upload():
 	if request.method == 'POST':
-		userId = request.get_json()['user_id']
-		interest = request.files['image']
-		email = request.get_json()['email']
-		password = request.get_json()['password']
-		feedback = dashboardQuery(email, password)
+		userId = request.form['user_id']
+		file = request.files['file']
+		email = request.form['email']
+		password = request.form['password']
+		feedback,data = dashboardQuery(email, password)
 
 		if feedback == "True":
 			access_token = create_access_token(identity = {
-				"name" : feedback['name'],
-				"email": feedback['email'],
-				"phone" : feedback['phone']
+				"name" : data['name'],
+				"email": data['email'],
+				"phone" : data['phone']
 				})
 			refresh_token = create_refresh_token(identity={
-				"name" : feedback['name'],
-				"email": feedback['email'],
-				"phone" : feedback['phone']
+				"name" : data['name'],
+				"email": data['email'],
+				"phone" : data['phone']
 				})
 			print(access_token)
-			feedback = verifyImage(file, userID)
+			feedback = verifyImage(file, userId)
 			return {"feedback":feedback}
 
 
