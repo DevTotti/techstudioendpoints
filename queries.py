@@ -7,9 +7,9 @@ import smtplib, ssl
 
 port = 465  
 smtp_server = "smtp.gmail.com"
-sender_email = "iotweaks@gmail.com"  
-receiver_email = "admin@gmail.com"  
-#password = input("Type your email password and press enter: ")
+sender_email = #please put in the sender mail here  
+receiver_email = #please put in the admin email here 
+password = #sender password here
 
 
 
