@@ -1,8 +1,17 @@
+#############################
+
 import mysql.connector as mysql
 from datetime import datetime
 import os, imghdr, random
 
 import smtplib, ssl
+
+##############################
+
+
+#######################
+#The emailsender and receiver credentials setup
+########################
 
 port = 465  
 smtp_server = "smtp.gmail.com"
@@ -11,7 +20,9 @@ receiver_email = ""  #insert the receiver email here
 password = #insert the sender email password here
 
 
+######################
 
+#Database connection
 
 try:
 	conn = mysql.connect(database = 'techStudio', user = 'root', host = 'localhost', password = 'postman')# edit the database connection credentials, host and database name
@@ -21,8 +32,12 @@ try:
 except Exception as error:
 	print(error)
 
+####################
 
 
+
+
+#function for querying the course from the database, returns an object of the course or course not found
 def queryCourse(name):
 	course_name = str(name)
 	print(course_name)
@@ -44,6 +59,8 @@ def queryCourse(name):
 
 
 
+
+#function that checks the input discount and queries the discont if active or not, returns active or expired
 def queryDiscount(course, disc):
 	course_name = course
 	discount = disc
@@ -74,6 +91,8 @@ def queryDiscount(course, disc):
 
 
 
+
+#the function that checks to see if a course name exists in the database
 def queryApplication(course):
 	course_name = course
 
@@ -91,7 +110,7 @@ def queryApplication(course):
 	return response
 
 
-
+#this function saves the feedback of users on the website into the database, returns feedback saved or not saved
 def feedBack(interests, channels):
 	interest = interests
 	channel = channels
@@ -109,6 +128,7 @@ def feedBack(interests, channels):
 
 
 
+#this fnction qeries all the users in the database, returns a list of all the users
 def queryUsers():
 	users = []
 	query = """SELECT * FROM USER """
@@ -123,7 +143,7 @@ def queryUsers():
 
 
 
-
+#thisfunction returns the object containing name, email and phone of a user queried from the database
 def queryUser(user_id):
 	userID = user_id
 
@@ -148,7 +168,7 @@ def queryUser(user_id):
 
 
 
-
+#this function finds a user with a specific email from the database, retrns if user is found or not
 def queryUserEmail(user_email):
 	userEmail = user_email
 
@@ -171,7 +191,7 @@ def queryUserEmail(user_email):
 
 
 
-
+#this function returns all the courses available in the database
 def queryCourses():
 	courses = []
 	query = """SELECT * FROM COURSE"""
@@ -187,7 +207,7 @@ def queryCourses():
 
 
 
-
+#this function verifies user credentials, authenticate it and returns true or false
 def dashboardQuery(email, password):
 	mail = email
 	passwd = password
@@ -223,7 +243,7 @@ def dashboardQuery(email, password):
 
 
 
-
+#this function verifies the payment receipt in form of image uploaded by the user and sends a mail to admin to confirm payment
 def verifyImage(file, user_id):
 	imgfile = file
 	userID = user_id
@@ -280,6 +300,7 @@ def verifyImage(file, user_id):
 
 
 
+#this function admin credentials and authorizes
 def confirmAdmin(user_id):
 	userID = user_id
 	query = """SELECT USER_ROLE.role_id from USER_ROLE INNER JOIN USER ON USER.id=USER_ROLE.user_id WHERE USER.id = '{}'""".format(userID)
@@ -297,6 +318,7 @@ def confirmAdmin(user_id):
 
 
 
+#this function gives admin the access to confirm if user has paid
 def confirmUserPay(user_id):
 	userID = user_id
 	query = """SELECT * FROM PAYMENT_DETAILS WHERE user_id = {}""".format(userID)
@@ -312,7 +334,7 @@ def confirmUserPay(user_id):
 	return response
 
 
-
+#this function gives admin access to update courses in the COURSE database
 def updateCourse(course_id, discount, discount_on, discount_ends):
 	courseID = course_id
 	disc = discount
@@ -335,7 +357,7 @@ def updateCourse(course_id, discount, discount_on, discount_ends):
 
 
 
-
+#this function allows admin to query course using the course ID and returns the course object if found
 def queryAdminCourse(course_id):
 	courseID = course_id
 
@@ -361,7 +383,7 @@ def queryAdminCourse(course_id):
 
 
 
-
+#this fnction allows admin to save course into the database
 def storeCourseObj(syllabus,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts):
 	query = """INSERT INTO COURSE (syllabus,title,name,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts)
 				values ('{}','{}','{}','{}','{}','{}','{}','{}','{}')""".format(syllabus,title,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts)
@@ -374,8 +396,10 @@ def storeCourseObj(syllabus,title,weekday_price,weekday_duration,weekday_starts,
 		return "course not created"
 
 
+
+#this function allows admin to update courses in the database
 def updateCourseObj(course_id,syllabus,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts):
-	query = """UPDATE COURSE SET syllabus = {},title = {}, name = {} ,weekday_price = {},weekday_duration = {},weekday_starts = {},weekend_price = {},weekend_duration = {},weekend_starts = {} WHERE course_id = {}""".format(syllabus,title,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts,course_id)
+	query = """UPDATE COURSE SET syllabus = '{}',title = '{}', name = '{}' ,weekday_price = '{}',weekday_duration = '{}',weekday_starts = '{}',weekend_price = '{}',weekend_duration = '{}',weekend_starts = '{}' WHERE course_id = '{}'""".format(syllabus,title,title,weekday_price,weekday_duration,weekday_starts,weekend_price,weekend_duration,weekend_starts,course_id)
 	try:
 		cursor.execute(query)
 		return "course edited successfully"
