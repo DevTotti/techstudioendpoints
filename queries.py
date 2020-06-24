@@ -1,21 +1,20 @@
 import mysql.connector as mysql
 from datetime import datetime
 import os, imghdr, random
-#import mysql.connector.cursor
 
 import smtplib, ssl
 
 port = 465  
 smtp_server = "smtp.gmail.com"
-sender_email = #please put in the sender mail here  
-receiver_email = #please put in the admin email here 
-password = #sender password here
+sender_email = ""  #insert the sender email
+receiver_email = ""  #insert the receiver email here
+password = #insert the sender email password here
 
 
 
 
 try:
-	conn = mysql.connect(database = 'techStudio', user = 'root', host = 'localhost', password = 'postman')
+	conn = mysql.connect(database = 'techStudio', user = 'root', host = 'localhost', password = 'postman')# edit the database connection credentials, host and database name
 	cursor = conn.cursor(buffered=True, dictionary=True)
 	print("connected Successfully!")
 

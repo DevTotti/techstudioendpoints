@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, session
+from flask import Flask, jsonify, request, session
 from flask_login import logout_user, LoginManager
 #from flask.ext.session import Session
 from flask_session import Session
@@ -28,7 +28,7 @@ adminAuth = []
 def logout():
     session.pop('email',None)
     
-    return "user logged off"
+    return {"response":"user logged off"}
 
 
 
@@ -38,10 +38,10 @@ def courses():
 	if request.method == 'POST':
 		course_name = request.get_json()['course_name']
 		feedback = queryCourse(course_name)
-		return feedback
+		return {"feedback":feedback}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 #tested, perfect
@@ -51,11 +51,11 @@ def discount():
 		course_name = request.get_json()['course_name']
 		discount = request.get_json()['discount']
 		feedback = queryDiscount(course_name, discount)
-		return feedback
+		return {"feedback":feedback}
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 #tested, perfect
@@ -64,11 +64,11 @@ def application():
 	if request.method == 'POST':
 		course_name = request.get_json()['course_name']
 		feedback = queryApplication(course_name)
-		return feedback
+		return {"feedback":feedback}
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 #tested, perfect
@@ -78,11 +78,11 @@ def feedback():
 		interest = request.get_json()['interest']
 		channel = request.get_json()['channel']
 		feedback = feedBack(interest, channel)
-		return feedback
+		return {"feedback":feedback}
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -113,11 +113,11 @@ def upload():
 
 
 		else:
-			return "User not found"
+			return {"response":"User not found"}
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -141,15 +141,15 @@ def dashboard():
 				})
 			print(access_token)
 
-			return "True"
+			return {"response":"True"}
 
 		else:
-			return "False"
+			return {"response":"False"}
 
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -213,7 +213,7 @@ def allUsers():
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -236,8 +236,9 @@ def findUser():
 			return {"feedback":"not aunthorized"}
 
 	else:
-		return ('not a valid request')
-	
+		return {"response":"not a valid request"}
+
+
 
 #tested, perfect
 @app.route('/users/payment/confirm', methods=['POST'])
@@ -259,7 +260,7 @@ def confirmPayment():
 
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 #tested, perfect
@@ -272,13 +273,13 @@ def searchUser():
 		answer = giveAdminAccess(email, password)
 		if answer == 'User is admin':
 			feedback = queryUserEmail(user_email)
-			return feedback
+			return {"feedback":feedback}
 
 		else:
 			return {"response":"not authorized"}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -297,7 +298,7 @@ def adminCourses():
 			return {"response":"not authorized"}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
@@ -338,7 +339,7 @@ def coursesDiscount():
 
 						if diseend:
 							feedback = updateCourse(course_id, discount, discount_on, discount_ends)
-							return feedback
+							return {"feedback":feedback}
 
 
 
@@ -355,7 +356,8 @@ def coursesDiscount():
 			return {"feedback":"not authorized"}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
+
 
 
 #tested, perfect
@@ -374,11 +376,11 @@ def adminCourse():
 			return {"feedback":"not authorized"}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
-
+#tested, perfect
 @app.route('/admin/course/', methods = ['POST'])
 def adminCreateCourse():
 	if request.method == 'POST':
@@ -441,14 +443,14 @@ def adminCreateCourse():
 				pass
 
 		else:
-			return "Invalid request input"
+			return {"response":"Invalid request input"}
 
 		#except Exception as error:
 		#	print(error)
 		#	return {"feedback":str(error)}
 
 	else:
-		return ('not a valid request')
+		return {"response":"not a valid request"}
 
 
 
