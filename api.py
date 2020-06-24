@@ -460,4 +460,5 @@ if __name__ == '__main__':
 	app.secret_key = 'jwnrwnubnerigjw'
 	app.config['SESSION_TYPE'] = 'filesystem'
 	sess.init_app(app)
+	#this part
 	app.run(debug=True, port = 4567)
