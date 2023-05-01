@@ -1,5 +1,5 @@
 flasgger==0.9.4                                                                            
-Flask==1.1.1                                                                                  
+Flask==2.3.2                                                                                  
 Flask-JWT-Extended==3.24.1                                                                 
 Flask-Login==0.5.0                                                                        
 flask-request-validator==2.1.2                                                             
